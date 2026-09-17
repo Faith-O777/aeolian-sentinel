@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Darrieus Turbine Visualiser</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { font-family: 'Roboto Mono', monospace; background: #121212; color: #e0e0e0; margin: 0; padding: 20px; }
+        .controls { background: #1e1e1e; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        #canvas-container { width: 100%; height: 60vh; background: #000; border-radius: 8px; overflow: hidden; }
+        input[type=range] { width: 100%; max-width: 300px; }
+        .nav { margin-bottom: 20px; display: inline-block; color: #4CAF50; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="nav">← Back to Menu</a>
+    <div class="controls">
+        <h2>Darrieus-Savonius Hybrid Visualiser</h2>
+        <label>Wind Speed: <span id="windVal">2</span> m/s</label><br>
+        <input type="range" id="windSlider" min="0" max="20" step="1" value="2"><br><br>
+        <label><input type="checkbox" id="strutToggle"> Highlight Acoustic Struts</label>
+    </div>
+    <div id="canvas-container"></div>
+
+    <script>
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+        
+        const group = new THREE.Group();
+        const matGrey = new THREE.MeshBasicMaterial({ color: 0x888888, wireframe: true });
+        const matHighlight = new THREE.MeshBasicMaterial({ color: 0x4CAF50 });
+        
+        // Shaft and Blades
+        group.add(new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 4, 16), matGrey));
+        const curve = new THREE.EllipseCurve(0, 0, 1.5, 2, 0, Math.PI, false, 0);
+        const points = curve.getPoints(50);
+        const bladeGeo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points.map(p => new THREE.Vector3(p.x, p.y, 0))), 20, 0.05, 8, false);
+        
+        const b1 = new THREE.Mesh(bladeGeo, matGrey); b1.rotation.z = Math.PI/2; group.add(b1);
+        const b2 = new THREE.Mesh(bladeGeo, matGrey); b2.rotation.z = Math.PI/2; b2.rotation.y = Math.PI; group.add(b2);
+
+        // Acoustic Strut
+        const strut = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 3, 16), matGrey);
+        strut.rotation.z = Math.PI/2;
+        group.add(strut);
+        scene.add(group);
+        camera.position.z = 6;
+
+        let speed = 2;
+        document.getElementById('windSlider').addEventListener('input', (e) => {
+            speed = parseFloat(e.target.value);
+            document.getElementById('windVal').innerText = speed;
+        });
+        document.getElementById('strutToggle').addEventListener('change', (e) => {
+            strut.material = e.target.checked ? matHighlight : matGrey;
+        });
+
+        function animate() { requestAnimationFrame(animate); group.rotation.y += (speed * 0.01); renderer.render(scene, camera); }
+        animate();
+        window.addEventListener('resize', () => { camera.aspect = container.clientWidth / container.clientHeight; camera.updateProjectionMatrix(); renderer.setSize(container.clientWidth, container.clientHeight); });
+    </script>
+</body>
+</html>
