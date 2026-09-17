@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coastal Acoustic Mediator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Roboto Mono', monospace; background: #121212; color: #e0e0e0; margin: 0; padding: 20px; }
+        .controls { background: #1e1e1e; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 20px; }
+        input[type=range] { width: 80%; max-width: 400px; margin: 20px 0; }
+        .grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        @media (min-width: 768px) { .grid { grid-template-columns: 1fr 1fr; } }
+        .card { background: #1e1e1e; padding: 20px; border-radius: 8px; }
+        video { width: 100%; border-radius: 4px; background: #000; }
+        .nav { margin-bottom: 20px; display: inline-block; color: #4CAF50; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="nav">← Back to Menu</a>
+    <div class="controls">
+        <h2 id="timeTitle">06:00 - Ecological Beacon</h2>
+        <input type="range" id="timeSlider" min="0" max="3" step="1" value="0">
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Site Animation</h3>
+            <!-- The video player that syncs with the slider -->
+            <video id="animPlayer" autoplay loop muted playsinline>
+                <source src="morning.mp4" type="video/mp4">
+            </video>
+        </div>
+        <div class="card">
+            <h3>Active Frequency Graph</h3>
+            <canvas id="freqChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const states = [
+            { title: "06:00 - Ecological Beacon (Avian Lure)", vid: "morning.mp4", chartIndex: 0 },
+            { title: "12:00 - Communal Sanctuary (Shark Deterrent)", vid: "midday.mp4", chartIndex: 1 },
+            { title: "16:00 - Hazard Siren (Rip Current Warning)", vid: "afternoon.mp4", chartIndex: 2 },
+            { title: "21:00 - Night Shelter (Acoustic Void)", vid: "night.mp4", chartIndex: 3 }
+        ];
+
+        const ctx = document.getElementById('freqChart').getContext('2d');
+        const freqChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['3kHz (Birds)', '120Hz (Sharks)', '60Hz (Siren)', '20Hz (Waves)'],
+                datasets: [{ data: [100, 0, 0, 0], backgroundColor: ['#4CAF50', '#333', '#333', '#333'] }]
+            },
+            options: { scales: { y: { display: false, max: 100 } }, plugins: { legend: { display: false } } }
+        });
+
+        document.getElementById('timeSlider').addEventListener('input', (e) => {
+            const state = states[e.target.value];
+            
+            // Update Title
+            document.getElementById('timeTitle').innerText = state.title;
+            
+            // Update Video Source
+            const player = document.getElementById('animPlayer');
+            player.src = state.vid;
+            player.play();
+
+            // Update Chart
+            const newData = [0, 0, 0, 0];
+            const newColors = ['#333', '#333', '#333', '#333'];
+            newData[state.chartIndex] = 100;
+            newColors[state.chartIndex] = '#4CAF50';
+            freqChart.data.datasets[0].data = newData;
+            freqChart.data.datasets[0].backgroundColor = newColors;
+            freqChart.update();
+        });
+    </script>
+</body>
+</html>
