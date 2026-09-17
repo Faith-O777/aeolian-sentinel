@@ -33,7 +33,7 @@
             </video>
         </div>
         <div class="card">
-            <h3>Active Frequency Graph</h3>
+            <h3>Active Frequency Spectrum</h3>
             <canvas id="freqChart"></canvas>
         </div>
     </div>
@@ -47,13 +47,36 @@
         ];
 
         const ctx = document.getElementById('freqChart').getContext('2d');
+        
+        // Create a gradient for the line fill
+        let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(50, 57, 241, 0.5)'); // Primary blue with opacity
+        gradient.addColorStop(1, 'rgba(50, 57, 241, 0.0)'); 
+
         const freqChart = new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: {
                 labels: ['3kHz (Birds)', '120Hz (Sharks)', '60Hz (Siren)', '20Hz (Waves)'],
-                datasets: [{ data: [100, 0, 0, 0], backgroundColor: ['#3239f1', '#333', '#333', '#333'] }]
+                datasets: [{ 
+                    data: [100, 0, 0, 0], 
+                    borderColor: '#3239f1',
+                    backgroundColor: gradient,
+                    borderWidth: 4,
+                    pointBackgroundColor: '#d8756f',
+                    pointBorderColor: '#050505',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    fill: true,
+                    tension: 0.4 // Makes the line smooth and curved
+                }]
             },
-            options: { scales: { y: { display: false, max: 100 } }, plugins: { legend: { display: false } } }
+            options: { 
+                scales: { 
+                    y: { display: false, max: 110, min: -10 },
+                    x: { grid: { color: '#333' }, ticks: { color: '#888' } }
+                }, 
+                plugins: { legend: { display: false } } 
+            }
         });
 
         document.getElementById('timeSlider').addEventListener('input', (e) => {
@@ -65,12 +88,16 @@
             player.src = state.vid;
             player.play();
 
+            // Update Chart Data
             const newData = [0, 0, 0, 0];
-            const newColors = ['#333', '#333', '#333', '#333'];
             newData[state.chartIndex] = 100;
-            newColors[state.chartIndex] = '#3239f1';
             freqChart.data.datasets[0].data = newData;
-            freqChart.data.datasets[0].backgroundColor = newColors;
+            
+            // Highlight the active point with secondary colour
+            const pointColors = ['#333', '#333', '#333', '#333'];
+            pointColors[state.chartIndex] = '#d8756f';
+            freqChart.data.datasets[0].pointBackgroundColor = pointColors;
+            
             freqChart.update();
         });
     </script>
