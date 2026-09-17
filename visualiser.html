@@ -7,84 +7,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        body { 
-            font-family: 'Roboto Mono', monospace; 
-            background: #050505; /* True dark mode */
-            color: #e0e0e0; 
-            margin: 0; 
-            overflow: hidden; 
-        }
-        #canvas-container { 
-            width: 100vw; 
-            height: 100vh; 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            z-index: 1; 
-        }
-        .nav { 
-            position: absolute; 
-            top: 20px; 
-            left: 20px; 
-            z-index: 10; 
-            color: #fff; 
-            text-decoration: none; 
-            background: rgba(50, 57, 241, 0.1); 
-            border: 1px solid #3239f1; /* Primary */
-            padding: 10px 15px; 
-            border-radius: 6px; 
-            font-weight: bold;
-            transition: 0.3s ease;
-        }
-        .nav:hover { 
-            background: #3239f1; 
-        }
-        
-        #ui-layer { 
-            position: absolute; 
-            bottom: 0; 
-            width: 100%; 
-            padding: 30px 20px; 
-            background: linear-gradient(transparent, rgba(5, 5, 5, 0.95) 40%); 
-            z-index: 10; 
-            display: flex; 
-            justify-content: space-evenly; 
-            align-items: center; 
-            box-sizing: border-box;
-        }
+        body { font-family: 'Roboto Mono', monospace; background: #050505; color: #e0e0e0; margin: 0; overflow: hidden; }
+        #canvas-container { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 1; }
+        .nav { position: absolute; top: 20px; left: 20px; z-index: 10; color: #fff; text-decoration: none; background: rgba(50, 57, 241, 0.1); border: 1px solid #3239f1; padding: 10px 15px; border-radius: 6px; font-weight: bold; transition: 0.3s ease; }
+        .nav:hover { background: #3239f1; }
+        #ui-layer { position: absolute; bottom: 0; width: 100%; padding: 30px 20px; background: linear-gradient(transparent, rgba(5, 5, 5, 0.95) 40%); z-index: 10; display: flex; justify-content: space-evenly; align-items: center; box-sizing: border-box; }
         .control-group { text-align: center; }
-        label { 
-            display: block; 
-            font-size: 0.8rem; 
-            color: #888; 
-            margin-bottom: 8px; 
-            text-transform: uppercase; 
-            letter-spacing: 2px; 
-        }
-        /* Secondary Colour for readouts */
-        .val { font-size: 1.4rem; font-weight: bold; color: #d8756f; } 
-        
-        /* Primary Colour for sliders */
-        input[type=range] { 
-            width: 180px; 
-            cursor: pointer; 
-            accent-color: #3239f1; 
-        }
-        
-        /* Custom Toggle Switch */
+        label { display: block; font-size: 0.8rem; color: #888; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 2px; }
+        .val { font-size: 1.4rem; font-weight: bold; color: #d8756f; }
+        input[type=range] { width: 180px; cursor: pointer; accent-color: #3239f1; }
         .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 24px; }
         .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-        /* Primary Colour for active toggle */
-        input:checked + .slider { background-color: #3239f1; } 
+        input:checked + .slider { background-color: #3239f1; }
         input:checked + .slider:before { transform: translateX(26px); }
     </style>
 </head>
 <body>
     <a href="index.html" class="nav">← Back to Menu</a>
     <div id="canvas-container"></div>
-    
     <div id="ui-layer">
         <div class="control-group">
             <label>Highlight Struts</label>
@@ -107,74 +49,59 @@
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
         scene.fog = new THREE.Fog('#050505', 5, 18);
-        
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
         camera.position.set(0, 0, 8.5);
-        
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         container.appendChild(renderer.domElement);
         
-        // Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
         scene.add(ambientLight);
-        
         const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
         dirLight.position.set(5, 10, 7);
         scene.add(dirLight);
 
         const group = new THREE.Group();
         
-        // Materials
         const matMetal = new THREE.MeshStandardMaterial({ color: 0xa0a0a0, roughness: 0.4, metalness: 0.6 });
-        // Primary Colour for active acoustic struts
         const matHighlight = new THREE.MeshStandardMaterial({ color: 0x3239f1, roughness: 0.2, metalness: 0.3, emissive: 0x111133 });
         const matConcrete = new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.9, metalness: 0.1 });
         
-        // Concrete Base Plinth
-        const baseGeo = new THREE.CylinderGeometry(1.2, 1.5, 0.4, 32);
-        const base = new THREE.Mesh(baseGeo, matConcrete);
+        const base = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.5, 0.4, 32), matConcrete);
         base.position.y = -2.2;
         scene.add(base);
 
-        const pillarGeo = new THREE.CylinderGeometry(0.3, 0.5, 0.6, 32);
-        const pillar = new THREE.Mesh(pillarGeo, matConcrete);
+        const pillar = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.5, 0.6, 32), matConcrete);
         pillar.position.y = -1.7;
         scene.add(pillar);
 
-        // 1. Central Shaft (Height: 4, from y=2 to y=-2)
-        const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 4, 16), matMetal);
+        const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 3, 16), matMetal);
         group.add(shaft);
         
-        // 2. Fixed Outer Blades using explicit anchor points
         const points = [];
         for ( let i = 0; i <= 20; i ++ ) {
             const t = i / 20; 
-            const y = 2 * Math.cos( t * Math.PI ); // Starts exactly at top of shaft, ends at bottom
-            const x = 1.5 * Math.sin( t * Math.PI ); // Curves outwards to 1.5m
+            const y = 1.5 * Math.cos( t * Math.PI ); 
+            const x = 1.5 * Math.sin( t * Math.PI ); 
             points.push( new THREE.Vector3( x, y, 0 ) );
         }
         const bladePath = new THREE.CatmullRomCurve3(points);
         const bladeGeo = new THREE.TubeGeometry(bladePath, 64, 0.04, 16, false);
         
-        // Add 4 symmetrical blades
         for (let i = 0; i < 4; i++) {
             const blade = new THREE.Mesh(bladeGeo, matMetal);
             blade.rotation.y = (Math.PI / 2) * i;
             group.add(blade);
         }
 
-        // 3. Acoustic Struts (Crossed)
         const struts = [];
         const strutGeo = new THREE.CylinderGeometry(0.03, 0.03, 3, 16);
         
-        // Strut aligned with X axis
         const s1 = new THREE.Mesh(strutGeo, matMetal);
         s1.rotation.z = Math.PI / 2;
         struts.push(s1);
         group.add(s1);
 
-        // Strut aligned with Z axis
         const s2 = new THREE.Mesh(strutGeo, matMetal);
         s2.rotation.x = Math.PI / 2;
         struts.push(s2);
@@ -182,7 +109,6 @@
 
         scene.add(group);
 
-        // Interactivity
         let speed = 4.0;
         document.getElementById('windSlider').addEventListener('input', (e) => {
             speed = parseFloat(e.target.value);
@@ -193,20 +119,9 @@
             struts.forEach(s => s.material = e.target.checked ? matHighlight : matMetal);
         });
 
-        // Animation Loop
-        function animate() { 
-            requestAnimationFrame(animate); 
-            group.rotation.y -= (speed * 0.015); // Spins based on wind speed
-            renderer.render(scene, camera); 
-        }
+        function animate() { requestAnimationFrame(animate); group.rotation.y -= (speed * 0.015); renderer.render(scene, camera); }
         animate();
-        
-        // Keep it responsive
-        window.addEventListener('resize', () => { 
-            camera.aspect = window.innerWidth / window.innerHeight; 
-            camera.updateProjectionMatrix(); 
-            renderer.setSize(window.innerWidth, window.innerHeight); 
-        });
+        window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
     </script>
 </body>
 </html>
