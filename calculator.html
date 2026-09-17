@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aeolian Strut Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Roboto Mono', monospace; background: #121212; color: #e0e0e0; margin: 0; padding: 20px; }
+        .controls { background: #1e1e1e; padding: 30px; border-radius: 8px; max-width: 500px; margin: 0 auto; }
+        input[type=range] { width: 100%; margin: 15px 0; }
+        .result { font-size: 1.5rem; color: #4CAF50; margin-top: 20px; padding: 15px; border: 2px dashed #4CAF50; text-align: center; }
+        .nav { margin-bottom: 20px; display: inline-block; color: #4CAF50; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="nav">← Back to Menu</a>
+    <div class="controls">
+        <h2>Aeolian Strut Calculator</h2>
+        <p>Strouhal Equation: D = (0.2 * Wind Speed) / Frequency</p>
+        
+        <label>Hazard Wind Speed: <span id="wOut">15</span> m/s</label>
+        <input type="range" id="wIn" min="5" max="30" value="15">
+        
+        <label>Target Resonant Frequency: <span id="fOut">60</span> Hz</label>
+        <input type="range" id="fIn" min="20" max="200" value="60">
+
+        <div class="result">
+            Required Strut Diameter:<br>
+            <strong id="dOut">50.0</strong> mm
+        </div>
+    </div>
+
+    <script>
+        function calc() {
+            const w = document.getElementById('wIn').value;
+            const f = document.getElementById('fIn').value;
+            document.getElementById('wOut').innerText = w;
+            document.getElementById('fOut').innerText = f;
+            const d = (0.2 * w) / f; // metres
+            document.getElementById('dOut').innerText = (d * 1000).toFixed(1); // mm
+        }
+        document.getElementById('wIn').addEventListener('input', calc);
+        document.getElementById('fIn').addEventListener('input', calc);
+    </script>
+</body>
+</html>
