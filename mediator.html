@@ -14,7 +14,10 @@
         .grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
         @media (min-width: 768px) { .grid { grid-template-columns: 1fr 1.2fr; } }
         .card { background: #111; padding: 20px; border-radius: 8px; display: flex; flex-direction: column; }
-        video { width: 100%; border-radius: 4px; background: #000; flex-grow: 1; }
+        
+        /* Style for both video and image to match perfectly */
+        video, #imageViewer { width: 100%; border-radius: 4px; background: #000; flex-grow: 1; object-fit: contain; }
+        
         .nav { margin-bottom: 20px; display: inline-block; color: #3239f1; text-decoration: none; font-weight: bold; }
         h2, h3 { color: #d8756f; margin-top: 0; }
         
@@ -34,9 +37,12 @@
     <div class="grid">
         <div class="card">
             <h3>Site Animation</h3>
+            <!-- Video Player for the first 3 states -->
             <video id="animPlayer" autoplay loop muted playsinline>
                 <source src="morning.mp4" type="video/mp4">
             </video>
+            <!-- Image Viewer for the night state, hidden by default -->
+            <img id="imageViewer" src="4.jpg" style="display: none;" alt="Night time acoustic void">
         </div>
         <div class="card">
             <h3>Acoustic Spectrum (Hz)</h3>
@@ -59,19 +65,19 @@
         const states = [
             { 
                 time: "06:00", effect: "Ecological Beacon", band: "3kHz (Birds)", 
-                vid: "morning.mp4", xMin: 2000, xMax: 5000, showBox: true 
+                media: "morning.mp4", type: "video", xMin: 2000, xMax: 5000, showBox: true 
             },
             { 
                 time: "12:00", effect: "Communal Sanctuary", band: "120Hz (Sharks)", 
-                vid: "midday.mp4", xMin: 20, xMax: 150, showBox: true 
+                media: "midday.mp4", type: "video", xMin: 20, xMax: 150, showBox: true 
             },
             { 
                 time: "16:00", effect: "Hazard Tone", band: "60Hz (Tone)", 
-                vid: "afternoon.mp4", xMin: 50, xMax: 300, showBox: true 
+                media: "afternoon.mp4", type: "video", xMin: 50, xMax: 300, showBox: true 
             },
             { 
                 time: "21:00", effect: "Acoustic Void", band: "20Hz (Waves)", 
-                vid: "night.mp4", showBox: false 
+                media: "4.jpg", type: "image", showBox: false 
             }
         ];
 
@@ -157,9 +163,21 @@
             document.getElementById('activeBandVal').innerText = state.band;
             document.getElementById('targetEffectVal').innerText = state.effect;
             
+            // Swap between video and image
             const player = document.getElementById('animPlayer');
-            player.src = state.vid;
-            player.play();
+            const imgViewer = document.getElementById('imageViewer');
+            
+            if (state.type === 'video') {
+                player.style.display = 'block';
+                imgViewer.style.display = 'none';
+                player.src = state.media;
+                player.play();
+            } else {
+                player.style.display = 'none';
+                imgViewer.style.display = 'block';
+                imgViewer.src = state.media;
+                player.pause();
+            }
 
             const box = freqChart.options.plugins.annotation.annotations.highlightBox;
             if (state.showBox) {
