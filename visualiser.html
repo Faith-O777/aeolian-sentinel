@@ -17,10 +17,10 @@
             background: linear-gradient(transparent, rgba(5, 5, 5, 0.95) 30%); 
             z-index: 10; display: flex; flex-wrap: wrap; justify-content: space-evenly; align-items: flex-end; gap: 15px;
         }
-        .control-group { text-align: center; min-width: 120px; margin-bottom: 10px; }
+        .control-group { text-align: center; min-width: 110px; margin-bottom: 10px; }
         label { display: block; font-size: 0.8rem; color: #888; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
         .val { font-size: 1.4rem; font-weight: bold; color: #d8756f; margin-bottom: 5px; }
-        input[type=range] { width: 100%; max-width: 150px; cursor: pointer; accent-color: #3239f1; }
+        input[type=range] { width: 100%; max-width: 130px; cursor: pointer; accent-color: #3239f1; }
         
         .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -48,7 +48,11 @@
             <input type="range" id="windSlider" min="0" max="30" step="0.1" value="15.0">
         </div>
         <div class="control-group">
-            <label>Strut Diameter</label>
+            <label>Rotation</label>
+            <div class="val"><span id="rpmVal">180.0</span> RPM</div>
+        </div>
+        <div class="control-group">
+            <label>Diameter</label>
             <div class="val"><span id="diamVal">50</span> mm</div>
             <input type="range" id="diamSlider" min="10" max="150" step="1" value="50">
         </div>
@@ -129,17 +133,19 @@
             const d_mm = parseFloat(document.getElementById('diamSlider').value);
             const d_m = d_mm / 1000;
             
+            // Calculate and display RPM based on a 12x ratio
+            const rpm = v * 12;
+            
             document.getElementById('windVal').innerText = v.toFixed(1);
+            document.getElementById('rpmVal').innerText = rpm.toFixed(1);
             document.getElementById('diamVal').innerText = d_mm;
             
-            // Strouhal math
             let freq = 0;
             if (d_m > 0) {
                 freq = (0.2 * v) / d_m;
             }
             document.getElementById('freqVal').innerText = freq.toFixed(1);
             
-            // Visually scale the struts. 50mm is the baseline scale of 1.0
             const visualScale = d_mm / 50;
             struts.forEach(s => {
                 s.scale.set(visualScale, 1, visualScale);
