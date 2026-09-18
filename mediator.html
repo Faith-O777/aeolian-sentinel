@@ -42,7 +42,7 @@
                 <source src="morning.mp4" type="video/mp4">
             </video>
             <!-- Image Viewer for the night state, hidden by default -->
-            <img id="imageViewer" src="4.jpg" style="display: none;" alt="Night time acoustic void">
+            <img id="imageViewer" src="night.jpg" style="display: none;" alt="Night time acoustic void">
         </div>
         <div class="card">
             <h3>Acoustic Spectrum (Hz)</h3>
@@ -77,7 +77,7 @@
             },
             { 
                 time: "21:00", effect: "Acoustic Void", band: "20Hz (Waves)", 
-                media: "4.jpg", type: "image", showBox: false 
+                media: "night.jpg", type: "image", showBox: false 
             }
         ];
 
@@ -163,7 +163,6 @@
             document.getElementById('activeBandVal').innerText = state.band;
             document.getElementById('targetEffectVal').innerText = state.effect;
             
-            // Swap between video and image
             const player = document.getElementById('animPlayer');
             const imgViewer = document.getElementById('imageViewer');
             
